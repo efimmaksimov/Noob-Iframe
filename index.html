@@ -107,13 +107,9 @@
     };
     document.body.appendChild(script);
 
-    window.addEventListener('unload', () => {
+    window.addEventListener('beforeunload', () => {
         window.GameScore.PlayerSync(false);
-        
-    })
-    window.addEventListener('pointerdown', () => {
-        window.GameScore.PlayerSync(false);
-        
+        return null;
     })
   </script>
 </body>
