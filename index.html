@@ -106,6 +106,10 @@
       });
     };
     document.body.appendChild(script);
+
+    window.addEventListener('unload', () => {
+        window.GameScore.player.sync();
+    })
   </script>
 </body>
 
