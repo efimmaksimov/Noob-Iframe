@@ -20,7 +20,38 @@
       window.GameScore = new GameScoreUnity(gs, unityI);
       await GameScore.AdsShowPreloader();
       GameScore.AdsShowSticky();
+      
+// For YandexTV
+      window.gs = gs;
+      if(gs.platform.type === 'YANDEX')
+          var ysdk = gs.platform.getNativeSDK();
+          ysdk.onEvent(ysdk.EVENTS.HISTORY_BACK, () => {
+            unityI.SendMessage('TVSdk', 'CallBackButton')
+          });  
+
+          //Debug
+          //window.addEventListener('keydown', function(event) {
+          //   if (event.code == 'Escape') 
+          //      unityI.SendMessage('TVSdk', 'CallBackButton')
+             
+          //});
+          //
     };
+
+    window.isTv = function() {
+        if(gs.platform.type === 'YANDEX')
+            return gs.platform.getNativeSDK().deviceInfo.isTV().toString()
+        else
+            return 'false'
+    }
+
+    window.Exit = function() {
+        if(gs.platform.type === 'YANDEX') {
+            console.info('EXIT');
+            gs.platform.getNativeSDK().dispatchEvent(gs.platform.getNativeSDK().EVENTS.EXIT);
+        }
+    }
+// /For YandexTV
   </script>
   <script async src="https://gs.eponesh.com/sdk/game-score.js?projectId=1942&publicToken=HGNPfXOxC7YnnEJDPFc708yBuEiiRV4M&callback=onGSInit"></script>
 </head>
@@ -42,15 +73,15 @@
   <script>
     const hideFullScreenButton = "1";
     const buildUrl = "Build";
-    const loaderUrl = buildUrl + "/Noob v1.0.loader.js";
+    const loaderUrl = buildUrl + "/NoobVKTest.loader.js";
     const config = {
-      dataUrl: buildUrl + "/1bcb33f221b0741d0161406c0ca8347b.data.unityweb",
-      frameworkUrl: buildUrl + "/ed206085593f5026eb2b2f4c03e9603b.js.unityweb",
-      codeUrl: buildUrl + "/3508c79c81c5bd38518e769503346b4a.wasm.unityweb",
+      dataUrl: buildUrl + "/317e654864a18b8f5cfa6fc87186d3ab.data.unityweb",
+      frameworkUrl: buildUrl + "/081e2e4693351269b8a86620f583e6b2.js.unityweb",
+      codeUrl: buildUrl + "/803411272a0559c34b0ef7d8dda52f7f.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "EfimMaximov",
       productName: "Noob Lumberjack",
-      productVersion: "1",
+      productVersion: "1.1",
     };
 
     const container = document.querySelector("#unity-container");
@@ -78,7 +109,7 @@
 
     if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
       container.className = "unity-mobile";
-      config.devicePixelRatio = 1;
+      //config.devicePixelRatio = 1;
     }
     loadingCover.style.display = "";
 
