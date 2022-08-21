@@ -15,14 +15,14 @@
       _unityAwaiter.done = resolve;
       _unityAwaiter.abort = reject;
     });
-    window.onGSInit = async (gs) => {
+      window.onGSInit = async (gs) => {
+      window.gs = gs;
       await _unityAwaiter.ready;
       window.GameScore = new GameScoreUnity(gs, unityI);
       await GameScore.AdsShowPreloader();
       GameScore.AdsShowSticky();
       
 // For YandexTV
-      window.gs = gs;
       if(gs.platform.type === 'YANDEX')
           var ysdk = gs.platform.getNativeSDK();
           ysdk.onEvent(ysdk.EVENTS.HISTORY_BACK, () => {
@@ -75,7 +75,7 @@
     const buildUrl = "Build";
     const loaderUrl = buildUrl + "/NoobVKTest.loader.js";
     const config = {
-      dataUrl: buildUrl + "/317e654864a18b8f5cfa6fc87186d3ab.data.unityweb",
+      dataUrl: buildUrl + "/f940950bed04b15be1e51ca8e67f245d.data.unityweb",
       frameworkUrl: buildUrl + "/081e2e4693351269b8a86620f583e6b2.js.unityweb",
       codeUrl: buildUrl + "/803411272a0559c34b0ef7d8dda52f7f.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
