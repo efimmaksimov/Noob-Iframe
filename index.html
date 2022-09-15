@@ -19,9 +19,22 @@
       window.gs = gs;
       await _unityAwaiter.ready;
       window.GameScore = new GameScoreUnity(gs, unityI);
-      await GameScore.AdsShowPreloader();
-      GameScore.AdsShowSticky();
+          if (!window.isTv()) {
+              await GameScore.AdsShowPreloader();
+              GameScore.AdsShowSticky();
+          }
+          //else {
+          //    window.addEventListener('keydown', function (event) {
+          //        if(!event.repeat)
+          //          unityI.SendMessage('TVSdk', 'KeyDown', event.keyCode);
+          //    });
+          //    window.addEventListener('keyup', function (event) {
+          //        unityI.SendMessage('TVSdk', 'KeyUp', event.keyCode);
+          //    });
+          //}
+          
       
+          const intervalID = setInterval(Sync, 120000);
 // For YandexTV
       if(gs.platform.type === 'YANDEX')
           var ysdk = gs.platform.getNativeSDK();
@@ -40,9 +53,9 @@
 
     window.isTv = function() {
         if(gs.platform.type === 'YANDEX')
-            return gs.platform.getNativeSDK().deviceInfo.isTV().toString()
+            return gs.platform.getNativeSDK().deviceInfo.isTV()
         else
-            return 'false'
+            return false
     }
 
     window.Exit = function() {
@@ -50,34 +63,72 @@
             console.info('EXIT');
             gs.platform.getNativeSDK().dispatchEvent(gs.platform.getNativeSDK().EVENTS.EXIT);
         }
-    }
+      }
+
+      window.addEventListener('resize', function (event) {
+          var bool = window.innerWidth > window.innerHeight ? 1 : 0;
+          unityI.SendMessage('Main Camera', 'SetFOV', bool);
+        }, true);
+
+      window.CanShowShortcut = function () {
+          if (gs.platform.type === 'YANDEX') {
+              gs.platform.getNativeSDK().shortcut.canShowPrompt().then(prompt => {
+                  console.log('Shortcut is allowed?:', prompt);
+                  if (prompt.canShow) {
+                      return "true";
+                  }
+                  else
+                      return "false";
+              });
+          }
+          else
+              return "false";
+      }
+
+      window.ShowShortcutPopup = function () {
+          if (gs.platform.type === 'YANDEX') {
+              gs.platform.getNativeSDK().shortcut.showPrompt().then(result => {
+                  console.log('Shortcut created?:', result);
+                  if (result.outcome === 'accepted') {
+                      unityI.SendMessage('AddShortcut', 'ClosePopup', "true");
+                  }
+                  else {
+                      unityI.SendMessage('AddShortcut', 'ClosePopup', "false");
+                  }
+              });
+          }
+      }
 // /For YandexTV
+      function Sync() {
+          gs.player.sync();
+          console.info("sync");
+      }
   </script>
   <script async src="https://gs.eponesh.com/sdk/game-score.js?projectId=1942&publicToken=HGNPfXOxC7YnnEJDPFc708yBuEiiRV4M&callback=onGSInit"></script>
 </head>
 
 <body class="dark">
-  <div id="unity-container" class="unity-desktop">
-    <canvas id="unity-canvas"></canvas>
-  </div>
-  <div id="loading-cover" style="display:none;">
-    <div id="unity-loading-bar">
-      <div id="unity-logo"><img src="logo.png"></div>
-      <div id="unity-progress-bar-empty" style="display: none;">
-        <div id="unity-progress-bar-full"></div>
-      </div>
-      <div class="spinner"></div>
+    <div id="unity-container" class="unity-desktop">
+        <canvas id="unity-canvas"></canvas>
     </div>
-  </div>
-  <div id="unity-fullscreen-button" style="display: none;"></div>
-  <script>
+    <div id="loading-cover" style="display:none;">
+        <div id="unity-loading-bar">
+            <div id="unity-logo"><img src="logo.png"></div>
+            <div id="unity-progress-bar-empty" style="display: none;">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+            <div class="spinner"></div>
+        </div>
+    </div>
+    <div id="unity-fullscreen-button" style="display: none;"></div>
+    <script>
     const hideFullScreenButton = "1";
     const buildUrl = "Build";
-    const loaderUrl = buildUrl + "/NoobVKTest.loader.js";
+    const loaderUrl = buildUrl + "/Noob v2.0.loader.js";
     const config = {
-      dataUrl: buildUrl + "/f940950bed04b15be1e51ca8e67f245d.data.unityweb",
-      frameworkUrl: buildUrl + "/081e2e4693351269b8a86620f583e6b2.js.unityweb",
-      codeUrl: buildUrl + "/803411272a0559c34b0ef7d8dda52f7f.wasm.unityweb",
+      dataUrl: buildUrl + "/005e2e277bdfceb551e865f100782546.data.unityweb",
+      frameworkUrl: buildUrl + "/afc481e2504810f090c7087ae6081226.js.unityweb",
+      codeUrl: buildUrl + "/5d8bdca4316b97427b687e640c466a2b.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "EfimMaximov",
       productName: "Noob Lumberjack",
@@ -109,7 +160,7 @@
 
     if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
       container.className = "unity-mobile";
-      //config.devicePixelRatio = 1;
+      config.devicePixelRatio = 1;
     }
     loadingCover.style.display = "";
 
@@ -144,7 +195,7 @@
         window.GameScore.PlayerSync(false);
         return null;
     })
-  </script>
+    </script>
 </body>
 
 </html>
